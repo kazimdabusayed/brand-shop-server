@@ -27,6 +27,28 @@ async function run() {
 	try {
 		// Connect the client to the server	(optional starting in v4.7)
 		await client.connect();
+
+		const userCollection = client.db("automotiveDB").collection("user");
+		const brandCollection = client.db("automotiveDB").collection("brand");
+		const productCollection = client.db("automotiveDB").collection("product");
+
+
+		//! create
+		app.post("/product", async (req, res) => {
+			const newProduct = req.body;
+			console.log(newProduct);
+			const result = await productCollection.insertOne(newProduct);
+			res.send(result);
+		});
+
+		//! read
+		app.get("/product", async(req, res) =>{
+			const cursor = productCollection.find();
+			const result = await cursor.toArray();
+			res.send(result);
+		})
+
+
 		// Send a ping to confirm a successful connection
 		await client.db("admin").command({ ping: 1 });
 		console.log(
@@ -34,14 +56,14 @@ async function run() {
 		);
 	} finally {
 		// Ensures that the client will close when you finish/error
-		await client.close();
+		// await client.close();
 	}
 }
 run().catch(console.dir);
 
 
 app.get("/", (req, res) => {
-	res.send("Hello World!");
+	res.send("AutoBuzz server is running");
 });
 
 app.listen(port, () => {
